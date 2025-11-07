@@ -1,0 +1,61 @@
+---
+title: "Authentication"
+description: "Authorize requests to the Yala API using API keys."
+---
+
+## Overview
+
+All requests to the Yala API must include an API key in the `x-api-key` header. Keys are environment-specific, scoped to your tenant, and grant access to the resources configured for your organization.
+
+<Note>
+  Treat your API keys like passwords. Rotate them periodically and delete keys that are no longer in use.
+</Note>
+
+## Obtain keys
+
+1. Request sandbox access from [support@useyala.com](mailto:support@useyala.com).
+2. Generate API keys in the Yala dashboard. Each key is associated with a specific environment (sandbox or production).
+3. Share keys securely with integration partners using a password manager or secret sharing tool.
+
+## Send authenticated requests
+
+<CodeGroup>
+```bash cURL
+curl https://gateway.staging.useyala.com/api/public/payouts/calculate/exchange-rate \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: <SANDBOX_API_KEY>" \
+  -d '{ ... }'
+```
+```javascript Node.js
+import axios from "axios";
+
+const client = axios.create({
+  baseURL: "https://gateway.staging.useyala.com/api/public",
+  headers: {
+    "Content-Type": "application/json",
+    "x-api-key": process.env.YALA_API_KEY!
+  },
+});
+
+const response = await client.post("/payouts/initiate", payload);
+```
+</CodeGroup>
+
+## Rotate keys
+
+- Maintain at least two active keys per environment so you can swap without downtime.
+- Update your application to use the new key, then revoke the old key in the dashboard.
+- Audit key usage regularly to ensure dormant keys are disabled.
+
+## Handling leaked keys
+
+If you suspect a key has been exposed:
+
+1. Revoke the compromised key immediately from the dashboard.
+2. Generate a new key and update your applications.
+3. Contact support with recent request IDs to investigate potential misuse.
+
+<Tip>
+  Monitor the [status page](https://status.useyala.com) for real-time updates on platform availability.
+</Tip>
+

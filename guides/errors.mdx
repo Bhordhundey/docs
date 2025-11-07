@@ -1,0 +1,63 @@
+---
+title: "Error Handling"
+description: "Understand common Yala API errors and how to recover gracefully."
+---
+
+## Error model
+
+All error responses follow a consistent envelope:
+
+```json
+{
+  "statusCode": 400,
+  "message": "Invalid request payload",
+  "data": null,
+  "errors": [
+    {
+      "field": "beneficiary.accountNumber",
+      "message": "Account number is required"
+    }
+  ]
+}
+```
+
+<Note>
+  Some legacy endpoints may omit the `errors` array. Always check the `message` field as a fallback.
+</Note>
+
+## HTTP status codes
+
+| Code | Meaning | Typical cause | Recommended action |
+|------|---------|---------------|--------------------|
+| `400` | Validation failure | Missing or malformed fields | Fix the payload and retry. |
+| `401` | Unauthorized | Incorrect or missing `x-api-key` | Refresh credentials or regenerate keys. |
+| `403` | Forbidden | Tenant not permitted to access the resource | Contact Yala support to adjust permissions. |
+| `404` | Not found | Resource removed or incorrect identifier | Confirm the ID and try again. |
+| `409` | Conflict | Duplicate payout reference or business constraint | Generate a new idempotency reference. |
+| `422` | Unprocessable | Business rule violation (e.g., beneficiary not approved) | Surface the message to internal ops for review. |
+| `429` | Rate limited | Too many requests in a short window | Back off exponentially and retry with jitter. |
+| `500` | Internal error | Platform issue | Retry with backoff and report to support if persistent. |
+
+## Retry strategy
+
+- Use idempotency keys (e.g., `payoutRef`) when retrying `POST` requests to avoid double submissions.
+- Retry `5xx` and `429` responses with exponential backoff (e.g., 1s, 2s, 4s) up to a maximum time window.
+- Avoid retrying validation (`4xx`) errors unless the payload is corrected.
+
+## Monitoring and alerting
+
+- Log the `statusCode`, `message`, and any nested `errors` for observability.
+- Set alerts on elevated `5xx` or `429` error rates per endpoint.
+- Subscribe to [status.useyala.com](https://status.useyala.com) for incident notifications.
+
+## Getting help
+
+Collect the following details before reaching out to support:
+
+- Request ID or `payoutRef`
+- Timestamp (UTC)
+- Endpoint and HTTP method
+- Full response payload and headers
+
+Email these details to [support@useyala.com](mailto:support@useyala.com) for expedited assistance.
+

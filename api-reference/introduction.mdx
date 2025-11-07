@@ -1,33 +1,71 @@
 ---
-title: 'Introduction'
-description: 'Example section for showcasing API endpoints'
+title: 'API Overview'
+description: 'Understand the core concepts behind Yala’s payout APIs.'
 ---
 
+## Base URLs
+
+| Environment | URL | Description |
+|-------------|-----|-------------|
+| Production | `https://gateway.useyala.com/api/public/` | Active customer traffic |
+| Sandbox | `https://gateway.staging.useyala.com/api/public/` | Testing and certification |
+
 <Note>
-  If you're not looking to build API reference documentation, you can delete
-  this section by removing the api-reference folder.
+  Sandbox credentials are isolated from production. Never mix API keys or base URLs between environments.
 </Note>
-
-## Welcome
-
-There are two ways to build API documentation: [OpenAPI](https://mintlify.com/docs/api-playground/openapi/setup) and [MDX components](https://mintlify.com/docs/api-playground/mdx/configuration). For the starter kit, we are using the following OpenAPI specification.
-
-<Card
-  title="Plant Store Endpoints"
-  icon="leaf"
-  href="https://github.com/mintlify/starter/blob/main/api-reference/openapi.json"
->
-  View the OpenAPI specification file
-</Card>
 
 ## Authentication
 
-All API endpoints are authenticated using Bearer tokens and picked up from the specification file.
+- All endpoints require the `x-api-key` header.
+- Keys are scoped to your Yala tenant—treat them as secrets.
+- Rotate keys regularly and store them using a secrets manager.
 
-```json
-"security": [
-  {
-    "bearerAuth": []
-  }
-]
+```http
+POST /payouts/initiate HTTP/1.1
+Host: gateway.staging.useyala.com
+Content-Type: application/json
+x-api-key: <SANDBOX_API_KEY>
 ```
+
+Refer to the [authentication guide](/guides/authentication) for client setup patterns.
+
+## Common resources
+
+- **Business**: Represents the entity that owns Yala wallets and authorizes payouts.
+- **Beneficiary**: The endpoint account receiving funds. Include payout rail-specific fields (e.g., `swiftNumber`, `routingNumber`) as required.
+- **Payout**: An instruction to send funds from a Yala wallet to a beneficiary. Each payout has a lifecycle captured in `PayoutData.status`.
+- **Exchange rate**: Quotes generated through the calculator endpoint. Rates expire quickly—always re-quote if the customer delays confirmation.
+- **Wallets**: Manage wallet balances, top ups, and currency holdings from the Yala dashboard. APIs debit these balances; we do not issue virtual account numbers per currency.
+
+## Supported currencies & payout rails
+
+Yala supports payouts across a wide range of currencies—including **CNY (RMB)**, **INR**, and additional African, European, and North American corridors.
+
+| Source currency | Destination currencies | Supported methods |
+|-----------------|------------------------|-------------------|
+| USD | USD, NGN, GHS, XOF, XAF, ZAR, CAD, EUR, GBP, CNY, INR | `wire`, `ach`, `swift`, `nip`, `china_wire`, `hk_fps`, `faster_payments`, `sepa` |
+| EUR | EUR, GBP, NGN, CNY | `sepa`, `swift` |
+| GBP | GBP, EUR, NGN, CNY | `faster_payments`, `bacs`, `swift` |
+| NGN | NGN, USD, EUR, GBP | `nip`, `swift` |
+| CNY | CNY | `swift`, `china_wire` |
+| INR | INR | `swift` |
+
+Use the calculator endpoint to confirm availability, FX rates, fees, and settlement times for the desired corridor before creating payouts. Rails are selected via the `method` field in both calculator and payout initiation requests.
+
+<Note>
+  Yala currently does not provide virtual IBANs or account numbers in these currencies. Fund and reconcile your wallets directly within the Yala app, then invoke the payout APIs to move balances to external beneficiaries.
+</Note>
+
+## Webhooks
+
+Contact Yala support to enable webhooks. When active, Yala sends event notifications (e.g., `payout.approved`, `payout.completed`) to your configured URL. Validate incoming requests by checking the source IP and verifying the shared secret provided during onboarding.
+
+## Rate limits
+
+- Default rate limit: **60 requests per minute** per tenant.
+- Bursts above the limit return HTTP `429` with a retry-after header.
+- For higher throughput, contact support with projected request volumes.
+
+## SDKs
+
+Official SDKs are under development. In the meantime, use your preferred HTTP client with the JSON payloads defined in this reference. Sample code snippets are provided throughout the guides.

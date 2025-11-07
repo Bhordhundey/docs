@@ -1,152 +1,106 @@
 {
-  "openapi": "3.1.0",
+  "openapi": "3.0.3",
   "info": {
-    "title": "OpenAPI Plant Store",
-    "description": "A sample API that uses a plant store as an example to demonstrate features in the OpenAPI specification",
-    "license": {
-      "name": "MIT"
-    },
-    "version": "1.0.0"
+    "title": "Yala API Documentation",
+    "description": "Welcome to Yala Platform's API documentation. This comprehensive API suite enables seamless integration with our financial services platform, providing secure and efficient access to cross-border payment solutions.\n\n<details>\n<summary><b>✨ Key Features</b></summary>\n\n- Real-time payment processing\n- Secure wallet management\n- Comprehensive exchange rate calculations\n- Robust transaction monitoring\n</details>\n\n<details>\n<summary><b>💰 Payment Methods and Fees</b></summary>\n\n## USD Payments\n\n| Destination | Method | Fees | Settlement Time |\n|------------|---------|------|-----------------|\n| United States | Wire | $20 | 1 day |\n| | ACH | $5.00 | 1 to 3 days |\n| China, Hong Kong | China wire/HK FPS | $20 | 24 to 72 hours |\n| Other Countries | Swift | $50 (<$2k)<br>$40 ($2k-$10k)<br>$0 (≥$10k) | 24 to 72 hours |\n\n### EUR Payments\n\n| Destination | Method | Fees | Settlement Time |\n|------------|---------|------|-----------------|\n| EU Countries | SEPA | $5.00 | < 48 hrs |\n| Other Countries | Swift | $50 (<$2k)<br>$40 ($2k-$10k)<br>$0 (≥$10k) | 24 to 72 hours |\n\n### GBP Payments\n\n| Destination | Method | Fees | Settlement Time |\n|------------|---------|------|-----------------|\n| United Kingdom | Faster Payments/BACS | $2.00 | < 24 hrs |\n| Other Countries | Swift | $50 (<$2k)<br>$40 ($2k-$10k)<br>$0 (≥$10k) | 24 to 72 hours |\n\n### Other Currencies\n\n| Currency | Destination | Method | Fees | Settlement Time |\n|----------|------------|---------|------|-----------------|\n| NGN | Nigeria | NIP | N100 | < 24 hrs |\n| CNY | All countries | Swift | $50 (<$2k)<br>$40 ($2k-$10k)<br>$0 (≥$10k) | 24 to 72 hours |\n| HKD | Hong Kong | FPS | $20 | < 24 hrs |\n| Multiple* | Any Country | Swift | $50 (<$2k)<br>$40 ($2k-$10k)<br>$0 (≥$10k) | 24 to 72 hours |\n\n*Includes: GHS, XAF, ZAR, XOF, CAD, KES, UGX, INR\n</details>\n\nFor additional support or integration assistance, please contact our developer support team.",
+    "version": "1.0.0",
+    "termsOfService": "https://useyala.com/",
+    "contact": {
+      "name": "API Support",
+      "email": "support@useyala.com"
+    }
   },
   "servers": [
     {
-      "url": "http://sandbox.mintlify.com"
+      "url": "https://gateway.useyala.com/api/public/",
+      "description": "Production server"
+    },
+    {
+      "url": "https://gateway.staging.useyala.com/api/public/",
+      "description": "Staging (Sandbox) server"
     }
   ],
-  "security": [
+  "tags": [
     {
-      "bearerAuth": []
+      "name": "Payouts",
+      "description": "Operations related to payouts"
     }
   ],
   "paths": {
-    "/plants": {
-      "get": {
-        "description": "Returns all plants from the system that the user has access to",
-        "parameters": [
-          {
-            "name": "limit",
-            "in": "query",
-            "description": "The maximum number of results to return",
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Plant response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Plant"
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Unexpected error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
-        }
-      },
+    "/payouts/calculate/exchange-rate": {
       "post": {
-        "description": "Creates a new plant in the store",
+        "tags": [
+          "Payouts"
+        ],
+        "summary": "Determine exchange rate and fee",
+        "description": "Determine the exchange rate and fees of a payout to a customer's bank account",
+        "operationId": "calculatorPayout",
         "requestBody": {
-          "description": "Plant to add to the store",
+          "description": "Payout exchange rate and fees calculator",
+          "required": true,
           "content": {
             "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/NewPlant"
+            "schema": {
+                "$ref": "#/components/schemas/CalculatorPayoutRequest"
               }
             }
-          },
-          "required": true
+          }
         },
         "responses": {
           "200": {
-            "description": "plant response",
+            "description": "A successful response",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Plant"
+                  "$ref": "#/components/schemas/CalculatorPayoutResponse"
                 }
               }
             }
           },
-          "400": {
-            "description": "unexpected error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
+          "500": {
+            "description": "Internal Server Error"
           }
         }
       }
     },
-    "/plants/{id}": {
-      "delete": {
-        "description": "Deletes a single plant based on the ID supplied",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "ID of plant to delete",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "Plant deleted",
-            "content": {}
-          },
-          "400": {
-            "description": "unexpected error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  },
-  "webhooks": {
-    "/plant/webhook": {
+    "/payouts/initiate": {
       "post": {
-        "description": "Information about a new plant added to the store",
+        "tags": [
+          "Payouts"
+        ],
+        "summary": "Initiate a payout transaction",
+        "description": "Create a new payout transaction to send money to a beneficiary's bank account",
+        "operationId": "initiatePayout",
         "requestBody": {
-          "description": "Plant added to the store",
+          "description": "Payout initiation request",
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/NewPlant"
+                "$ref": "#/components/schemas/PayoutInitiateRequest"
               }
             }
           }
         },
         "responses": {
-          "200": {
-            "description": "Return a 200 status to indicate that the data was received successfully"
+          "201": {
+            "description": "Payout initiated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PayoutInitiateResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Invalid input data"
+          },
+          "401": {
+            "description": "Unauthorized - Invalid API key"
+          },
+          "500": {
+            "description": "Internal Server Error"
           }
         }
       }
@@ -154,64 +108,748 @@
   },
   "components": {
     "schemas": {
-      "Plant": {
-        "required": [
-          "name"
-        ],
+      "CalculatorPayoutRequest": {
         "type": "object",
+        "required": [
+          "sourceAmount",
+          "sourceCurrency",
+          "destinationCurrency",
+          "feeBearer",
+          "method",
+          "destinationCountryCode"
+        ],
         "properties": {
-          "name": {
-            "description": "The name of the plant",
-            "type": "string"
+          "sourceAmount": {
+            "type": "number",
+            "format": "float",
+            "example": 1000
           },
-          "tag": {
-            "description": "Tag to specify the type",
-            "type": "string"
+          "sourceCurrency": {
+            "type": "string",
+            "example": "USD"
+          },
+          "destinationCurrency": {
+            "type": "string",
+            "example": "NGN"
+          },
+          "feeBearer": {
+            "type": "string",
+            "enum": [
+              "customer",
+              "tenant"
+            ],
+            "example": "tenant"
+          },
+          "method": {
+            "type": "string",
+            "enum": [
+              "swift",
+              "nip",
+              "hk_fps",
+              "china_wire",
+              "faster_payments",
+              "wire",
+              "ach",
+              "sepa"
+            ]
+          },
+          "destinationCountryCode": {
+            "type": "string",
+            "example": "NGA"
           }
         }
       },
-      "NewPlant": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/Plant"
+      "CalculatorPayoutResponse": {
+        "type": "object",
+        "properties": {
+          "statusCode": {
+            "type": "integer",
+            "example": 200
           },
-          {
-            "required": [
-              "id"
-            ],
+          "message": {
+            "type": "string",
+            "example": "success"
+          },
+          "data": {
             "type": "object",
             "properties": {
-              "id": {
-                "description": "Identification number of the plant",
-                "type": "integer",
-                "format": "int64"
+              "sourceAmount": {
+                "type": "number",
+                "example": 1000
+              },
+              "totalDeductible": {
+                "type": "number",
+                "format": "float",
+                "example": 1000.060659
+              },
+              "convertedAmount": {
+                "type": "number",
+                "example": 1648542.48
+              },
+              "destinationAmount": {
+                "type": "number",
+                "format": "float",
+                "example": 1648442.48
+              },
+              "sourceCurrency": {
+                "type": "string",
+                "example": "USD"
+              },
+              "destinationCurrency": {
+                "type": "string",
+                "example": "NGN"
+              },
+              "exchangeRate": {
+                "type": "number",
+                "format": "float",
+                "example": 1648.54248
+              },
+              "feeBearer": {
+                "type": "string",
+                "example": "TENANT"
+              },
+              "includedFees": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "method": {
+                      "type": "string",
+                      "example": "Nip"
+                    },
+                    "amount": {
+                      "type": "number",
+                      "format": "float",
+                      "example": 100
+                    },
+                    "currency": {
+                      "type": "string",
+                      "example": "NGN"
+                    },
+                    "settlementDuration": {
+                      "type": "string",
+                      "example": "< 48 hours"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "PayoutInitiateRequest": {
+        "type": "object",
+        "required": [
+          "businessId",
+          "sourceAmount",
+          "sourceCurrency",
+          "destinationCurrency",
+          "feeBearer",
+          "method",
+          "destinationCountryCode",
+          "narration",
+          "beneficiary"
+        ],
+        "properties": {
+          "businessId": {
+            "type": "string",
+            "format": "uuid",
+            "example": "6fd2b69f-c529-4fe4-b680-29256f860553",
+            "description": "Unique identifier for the business"
+          },
+          "sourceAmount": {
+            "type": "number",
+            "example": 1000,
+            "description": "Amount in the source currency"
+          },
+          "sourceCurrency": {
+            "type": "string",
+            "example": "USD",
+            "description": "Source currency code"
+          },
+          "destinationCurrency": {
+            "type": "string",
+            "example": "NGN",
+            "description": "Destination currency code"
+          },
+          "feeBearer": {
+            "type": "string",
+            "enum": [
+              "CUSTOMER",
+              "TENANT"
+            ],
+            "example": "TENANT",
+            "description": "Who bears the fees for this transaction"
+          },
+          "method": {
+            "type": "string",
+            "enum": [
+              "SWIFT",
+              "NIP",
+              "HK_FPS",
+              "CHINA_WIRE",
+              "FASTER_PAYMENTS",
+              "WIRE",
+              "ACH",
+              "SEPA"
+            ],
+            "example": "NIP",
+            "description": "Payment method"
+          },
+          "destinationCountryCode": {
+            "type": "string",
+            "example": "NGA",
+            "description": "Destination country code"
+          },
+          "supportingDocument": {
+            "type": "string",
+            "format": "uri",
+            "example": "https://sample.com/doc",
+            "description": "URL to supporting document"
+          },
+          "narration": {
+            "type": "string",
+            "example": "Andromeda Galaxy",
+            "description": "Transaction description"
+          },
+          "beneficiary": {
+            "$ref": "#/components/schemas/Beneficiary"
+          }
+        }
+      },
+      "Beneficiary": {
+        "type": "object",
+        "required": [
+          "countryCode",
+          "bankCountryCode",
+          "accountNumber",
+          "accountName",
+          "bankName",
+          "accountCurrency",
+          "payoutMethod",
+          "isIndividual"
+        ],
+        "properties": {
+          "countryCode": {
+            "type": "string",
+            "example": "NGA",
+            "description": "Country code of beneficiary"
+          },
+          "bankCountryCode": {
+            "type": "string",
+            "example": "NGA",
+            "description": "Country code of beneficiary's bank"
+          },
+          "accountNumber": {
+            "type": "string",
+            "example": "8068487823",
+            "description": "Beneficiary's account number"
+          },
+          "accountName": {
+            "type": "string",
+            "example": "Will Wonker",
+            "description": "Beneficiary's account name"
+          },
+          "bankName": {
+            "type": "string",
+            "example": "OPay",
+            "description": "Name of beneficiary's bank"
+          },
+          "accountCurrency": {
+            "type": "string",
+            "example": "NGN",
+            "description": "Currency of beneficiary's account"
+          },
+          "address": {
+            "type": "string",
+            "example": "2, 4th Avenue, Off Prince Ademola Eletu way, Jakande, Lekki",
+            "description": "Beneficiary's address"
+          },
+          "city": {
+            "type": "string",
+            "example": "Lekki",
+            "description": "Beneficiary's city"
+          },
+          "postCode": {
+            "type": "string",
+            "example": "SG1 5LH",
+            "description": "Beneficiary's postal code"
+          },
+          "payoutMethod": {
+            "type": "string",
+            "enum": [
+              "SWIFT",
+              "NIP",
+              "HK_FPS",
+              "CHINA_WIRE",
+              "FASTER_PAYMENTS",
+              "WIRE",
+              "ACH",
+              "SEPA"
+            ],
+            "example": "SWIFT",
+            "description": "Payment method for this beneficiary"
+          },
+          "swiftNumber": {
+            "type": "string",
+            "example": "34323232",
+            "description": "SWIFT/BIC code"
+          },
+          "routingNumber": {
+            "type": "string",
+            "example": "",
+            "description": "Routing number (for US banks)"
+          },
+          "sortCode": {
+            "type": "string",
+            "example": "111111",
+            "description": "Sort code (for UK banks)"
+          },
+          "phoneNumber": {
+            "type": "string",
+            "example": "",
+            "description": "Beneficiary's phone number"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "",
+            "description": "Beneficiary's email address"
+          },
+          "bankBranchCode": {
+            "type": "string",
+            "example": "",
+            "description": "Bank branch code"
+          },
+          "bankAddress": {
+            "type": "string",
+            "example": "",
+            "description": "Bank address"
+          },
+          "bankCode": {
+            "type": "string",
+            "example": "34323232",
+            "description": "Bank code"
+          },
+          "bicNumber": {
+            "type": "string",
+            "example": "34323232",
+            "description": "BIC number"
+          },
+          "isIndividual": {
+            "type": "boolean",
+            "example": true,
+            "description": "Whether beneficiary is an individual (true) or business (false)"
+          }
+        }
+      },
+      "PayoutInitiateResponse": {
+        "type": "object",
+        "properties": {
+          "statusCode": {
+            "type": "integer",
+            "example": 201,
+            "description": "HTTP status code"
+          },
+          "message": {
+            "type": "string",
+            "example": "success",
+            "description": "Response message"
+          },
+          "data": {
+            "$ref": "#/components/schemas/PayoutData"
+          }
+        }
+      },
+      "PayoutData": {
+        "type": "object",
+        "properties": {
+          "businessId": {
+            "type": "string",
+            "format": "uuid",
+            "example": "02730067-e309-4e43-b865-ad1e7373fd8f"
+          },
+          "baseAmount": {
+            "type": "number",
+            "example": 3300000
+          },
+          "baseCurrency": {
+            "type": "string",
+            "example": "NGN"
+          },
+          "amountToBeSent": {
+            "type": "number",
+            "format": "float",
+            "example": 1966.85
+          },
+          "currencyToBeSent": {
+            "type": "string",
+            "example": "USD"
+          },
+          "beneficiary": {
+            "$ref": "#/components/schemas/BeneficiaryResponse"
+          },
+          "supportingDocument": {
+            "type": "string",
+            "format": "uri",
+            "example": "https://sample.com/doc"
+          },
+          "method": {
+            "type": "string",
+            "example": "SWIFT"
+          },
+          "narration": {
+            "type": "string",
+            "example": "Andromeda Galaxy"
+          },
+          "VAT": {
+            "type": "string",
+            "nullable": true,
+            "example": null
+          },
+          "methodFees": {
+            "type": "string",
+            "nullable": true,
+            "example": null
+          },
+          "transactionFees": {
+            "type": "string",
+            "nullable": true,
+            "example": null
+          },
+          "beneficiaryId": {
+            "type": "string",
+            "format": "uuid",
+            "example": "a51cc961-366a-4346-be7c-de8541431d3f"
+          },
+          "status": {
+            "type": "string",
+            "example": "PENDING_APPROVAL",
+            "description": "Current status of the payout"
+          },
+          "business": {
+            "$ref": "#/components/schemas/Business"
+          },
+          "riskLevel": {
+            "type": "string",
+            "example": "LOW",
+            "description": "Risk level assessment"
+          },
+          "payoutRef": {
+            "type": "string",
+            "example": "1r4Wx1MQEP",
+            "description": "Unique payout reference"
+          },
+          "category": {
+            "type": "object",
+            "example": {}
+          },
+          "sourceWallet": {
+            "$ref": "#/components/schemas/SourceWallet"
+          },
+          "meta": {
+            "$ref": "#/components/schemas/PayoutMeta"
+          },
+          "transactionDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "example": null
+          },
+          "channel": {
+            "type": "string",
+            "nullable": true,
+            "example": null
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "7501f00c-7977-4fed-aef7-6b0746bfddc6"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2025-01-16T12:57:49.996Z"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2025-01-16T12:57:49.000Z"
+          },
+          "deletedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "example": null
+          },
+          "transactions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Transaction"
+            }
+          }
+        }
+      },
+      "BeneficiaryResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Beneficiary"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "riskLevel": {
+                "type": "string",
+                "example": "LOW"
+              },
+              "verificationStatus": {
+                "type": "string",
+                "example": "PENDING"
               }
             }
           }
         ]
       },
-      "Error": {
-        "required": [
-          "error",
-          "message"
-        ],
+      "Business": {
         "type": "object",
         "properties": {
-          "error": {
-            "type": "integer",
-            "format": "int32"
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "02730067-e309-4e43-b865-ad1e7373fd8f"
           },
-          "message": {
-            "type": "string"
+          "name": {
+            "type": "string",
+            "example": "Big O Express"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "bigoexpress1@yopmail.com"
+          },
+          "website": {
+            "type": "string",
+            "example": "www.bigoexpress.com"
+          }
+        }
+      },
+      "SourceWallet": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "b7e5ac80-829f-4b97-b845-1b9a70f9f4ff"
+          },
+          "type": {
+            "type": "string",
+            "example": "BUSINESS_WALLET"
+          },
+          "balance": {
+            "type": "number",
+            "format": "float",
+            "example": 66323010.160000004
+          },
+          "currency": {
+            "type": "string",
+            "example": "NGN"
+          },
+          "processor": {
+            "type": "string",
+            "example": "Yala"
+          },
+          "walletRef": {
+            "type": "string",
+            "example": "YALA75910"
+          },
+          "accountNumber": {
+            "type": "string",
+            "example": "9252038588"
+          },
+          "accountName": {
+            "type": "string",
+            "nullable": true,
+            "example": null
+          }
+        }
+      },
+      "PayoutMeta": {
+        "type": "object",
+        "properties": {
+          "statusChange": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StatusChange"
+            }
+          },
+          "exchangeRate": {
+            "$ref": "#/components/schemas/ExchangeRate"
+          }
+        }
+      },
+      "StatusChange": {
+        "type": "object",
+        "properties": {
+          "updatedBy": {
+            "type": "string",
+            "example": "API "
+          },
+          "email": {
+            "type": "string",
+            "example": "API"
+          },
+          "status": {
+            "type": "string",
+            "example": "PENDING_APPROVAL"
+          },
+          "date": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2025-01-16T12:57:49.996Z"
+          }
+        }
+      },
+      "ExchangeRate": {
+        "type": "object",
+        "properties": {
+          "from": {
+            "type": "string",
+            "example": "NGN"
+          },
+          "to": {
+            "type": "string",
+            "example": "USD"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "a836fb63-a11b-4952-896d-7ef7e01fea14"
+          },
+          "sellRate": {
+            "type": "number",
+            "format": "float",
+            "example": 1677.808472
+          },
+          "sellSpread": {
+            "type": "number",
+            "format": "float",
+            "example": 0.75
+          },
+          "buyRate": {
+            "type": "number",
+            "format": "float",
+            "example": 1648.54248
+          },
+          "buySpread": {
+            "type": "number",
+            "format": "float",
+            "example": -0.75
+          },
+          "marketRate": {
+            "type": "number",
+            "format": "float",
+            "example": 1661
+          },
+          "code": {
+            "type": "string",
+            "example": "USD/NGN"
+          }
+        }
+      },
+      "Transaction": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "type": "number",
+            "example": -3300000
+          },
+          "wallet": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "example": "b7e5ac80-829f-4b97-b845-1b9a70f9f4ff"
+              }
+            }
+          },
+          "type": {
+            "type": "string",
+            "example": "DEBIT"
+          },
+          "method": {
+            "type": "string",
+            "example": "SWIFT"
+          },
+          "balanceBefore": {
+            "type": "number",
+            "format": "float",
+            "example": 69705437.28
+          },
+          "balanceAfter": {
+            "type": "number",
+            "format": "float",
+            "example": 66405437.28
+          },
+          "provider": {
+            "type": "string",
+            "example": "YALA"
+          },
+          "reference": {
+            "type": "string",
+            "example": "1r4Wx1MQEP"
+          },
+          "currency": {
+            "type": "string",
+            "example": "NGN"
+          },
+          "remarks": {
+            "type": "string",
+            "example": "Payout"
+          },
+          "narration": {
+            "type": "string",
+            "nullable": true,
+            "example": null
+          },
+          "code": {
+            "type": "string",
+            "example": "TRX_6f4mRvEfDhu16nZHv"
+          },
+          "meta": {
+            "type": "object",
+            "nullable": true,
+            "example": null
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "3620bae6-0cd4-4235-aa4d-cb7a1eef8c00"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2025-01-16T12:57:49.982Z"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2025-01-16T12:57:49.982Z"
           }
         }
       }
     },
     "securitySchemes": {
-      "bearerAuth": {
-        "type": "http",
-        "scheme": "bearer"
+      "ApiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-api-key"
       }
     }
-  }
+  },
+  "security": [
+    {
+      "ApiKeyAuth": []
+    }
+  ]
 }

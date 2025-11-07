@@ -1,80 +1,107 @@
 ---
 title: "Quickstart"
-description: "Start building awesome documentation in minutes"
+description: "Create and send your first payout through the Yala API."
 ---
 
-## Get started in three steps
+## Prerequisites
 
-Get your documentation site running locally and make your first customization.
+- An active Yala sandbox account. Request access by emailing [support@useyala.com](mailto:support@useyala.com).
+- A sandbox API key (`x-api-key`) with payouts permissions.
+- A registered business and at least one approved beneficiary in the sandbox dashboard.
+- Funded wallets in the Yala app for the currencies you plan to send. Yala does not issue standalone virtual account numbers; wallet balances are managed in-app.
 
-### Step 1: Set up your local environment
+## 1. Configure environments
 
 <AccordionGroup>
-  <Accordion icon="copy" title="Clone your docs locally">
-    During the onboarding process, you created a GitHub repository with your docs content if you didn't already have one. You can find a link to this repository in your [dashboard](https://dashboard.mintlify.com).
-    
-    To clone the repository locally so that you can make and preview changes to your docs, follow the [Cloning a repository](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository) guide in the GitHub docs.
+  <Accordion icon="server" title="Choose the right base URL">
+    | Environment | Base URL |
+    |-------------|----------|
+    | Production  | `https://gateway.useyala.com/api/public/` |
+    | Sandbox     | `https://gateway.staging.useyala.com/api/public/` |
+
+    Always send HTTPS requests and include the trailing slash to avoid redirect latency.
   </Accordion>
-  <Accordion icon="rectangle-terminal" title="Start the preview server">
-    1. Install the Mintlify CLI: `npm i -g mint`
-    2. Navigate to your docs directory and run: `mint dev`
-    3. Open `http://localhost:3000` to see your docs live!
-    
-    <Tip>Your preview updates automatically as you edit files.</Tip>
+  <Accordion icon="key" title="Store your API key securely">
+    Save the `x-api-key` in your secret manager and inject it at runtime. Avoid hardcoding keys in source control.
   </Accordion>
 </AccordionGroup>
 
-### Step 2: Deploy your changes
+## 2. Quote a payout
 
-<AccordionGroup>
-  <Accordion icon="github" title="Install our GitHub app">
-    Install the Mintlify GitHub app from your [dashboard](https://dashboard.mintlify.com/settings/organization/github-app).
-    
-    Our GitHub app automatically deploys your changes to your docs site, so you don't need to manage deployments yourself.
-</Accordion>
-<Accordion icon="palette" title="Update your site name and colors">
-    For a first change, let's update the name and colors of your docs site.
+Call the calculator endpoint to surface total cost, exchange rates, and settlement timing before initiating a payout.
 
-    1. Open `docs.json` in your editor.
-    2. Change the `"name"` field to your project name.
-    3. Update the `"colors"` to match your brand.
-    4. Save and see your changes instantly at `http://localhost:3000`.
+```bash
+curl https://gateway.staging.useyala.com/api/public/payouts/calculate/exchange-rate \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: <SANDBOX_API_KEY>" \
+  -d '{
+    "sourceAmount": 1000,
+    "sourceCurrency": "USD",
+    "destinationCurrency": "NGN",
+    "feeBearer": "tenant",
+    "method": "nip",
+    "destinationCountryCode": "NGA"
+  }'
+```
 
-    <Tip>Try changing the primary color to see an immediate difference!</Tip>
-  </Accordion>
-</AccordionGroup>
+<Tip>
+  Use the `includedFees` array in the response to itemize costs in your UI.
+</Tip>
 
-### Step 3: Go live
+## 3. Initiate the payout
 
-<Accordion icon="rocket" title="Publish your docs">
-  1. Commit and push your changes.
-  2. Your docs will update and be live in moments!
-</Accordion>
+Use the quote data to build a payout request. The `businessId` and beneficiary details must already exist in Yala.
+
+```bash
+curl https://gateway.staging.useyala.com/api/public/payouts/initiate \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: <SANDBOX_API_KEY>" \
+  -d '{
+    "businessId": "6fd2b69f-c529-4fe4-b680-29256f860553",
+    "sourceAmount": 1000,
+    "sourceCurrency": "USD",
+    "destinationCurrency": "NGN",
+    "feeBearer": "TENANT",
+    "method": "NIP",
+    "destinationCountryCode": "NGA",
+    "narration": "Andromeda Galaxy",
+    "supportingDocument": "https://sample.com/doc",
+    "beneficiary": {
+      "countryCode": "NGA",
+      "bankCountryCode": "NGA",
+      "accountNumber": "8068487823",
+      "accountName": "Will Wonker",
+      "bankName": "OPay",
+      "accountCurrency": "NGN",
+      "payoutMethod": "NIP",
+      "isIndividual": true
+    }
+  }'
+```
+
+<Tip>
+  Persist the `payoutRef` from the response to reconcile downstream status updates.
+</Tip>
+
+## 4. Track payout status
+
+- Poll the `status` field in `PayoutData` to drive user-facing updates (e.g., `PENDING_APPROVAL`, `PROCESSING`, `COMPLETED`).
+- Record the `meta.statusChange` timeline for audit logs.
+- Contact support to enable real-time webhooks for automated status notifications.
 
 ## Next steps
 
-Now that you have your docs running, explore these key features:
-
 <CardGroup cols={2}>
-
-<Card title="Write Content" icon="pen-to-square" href="/essentials/markdown">
-  Learn MDX syntax and start writing your documentation.
-</Card>
-
-<Card title="Customize style" icon="palette" href="/essentials/settings">
-  Make your docs match your brand perfectly.
-</Card>
-
-<Card title="Add code examples" icon="square-code" href="/essentials/code">
-  Include syntax-highlighted code blocks.
-</Card>
-
-<Card title="API documentation" icon="code" href="/api-reference/introduction">
-  Auto-generate API docs from OpenAPI specs.
-</Card>
-
+  <Card title="Authentication guide" icon="lock" href="/guides/authentication">
+    Learn how to manage API keys and rotate credentials.
+  </Card>
+  <Card title="Error handling" icon="triangle-exclamation" href="/guides/errors">
+    Handle validation failures and rate limiting gracefully.
+  </Card>
+  <Card title="Exchange rate endpoint" icon="calculator" href="/api-reference/endpoint/calculate-exchange-rate">
+    Review schema definitions and sample responses.
+  </Card>
+  <Card title="Payout initiation endpoint" icon="paper-plane" href="/api-reference/endpoint/initiate">
+    Understand required fields and response structure.
+  </Card>
 </CardGroup>
-
-<Note>
-  **Need help?** See our [full documentation](https://mintlify.com/docs) or join our [community](https://mintlify.com/community).
-</Note>

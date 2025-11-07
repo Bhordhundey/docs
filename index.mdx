@@ -1,97 +1,75 @@
 ---
-title: "Introduction"
-description: "Welcome to the new home for your documentation"
+title: "Welcome to Yala"
+description: "Integrate cross-border payouts, real-time FX quotes, and wallet services with a single API."
 ---
 
-## Setting up
+<Hero
+  title="Powering global payouts for modern platforms"
+  subtitle="Build cross-border payment experiences for your customers with Yala’s secure payout APIs."
+  ctaPrimary={{ label: "Start building", href: "/quickstart" }}
+  ctaSecondary={{ label: "Explore the API", href: "/api-reference/introduction" }}
+  image="/images/hero-light.png"
+/>
 
-Get your documentation site up and running in minutes.
+## Why build with Yala
 
-<Card
-  title="Start here"
-  icon="rocket"
-  href="/quickstart"
-  horizontal
->
-  Follow our three step quickstart guide.
-</Card>
-
-## Make it yours
-
-Design a docs site that looks great and empowers your users.
-
-<Columns cols={2}>
-  <Card
-    title="Edit locally"
-    icon="pen-to-square"
-    href="/development"
-  >
-    Edit your docs locally and preview them in real time.
+<Columns cols={3}>
+  <Card title="Global coverage" icon="globe">
+    Send funds to key corridors across Africa, Europe, Asia, and North America with local settlement rails.
   </Card>
-  <Card
-    title="Customize your site"
-    icon="palette"
-    href="/essentials/settings"
-  >
-    Customize the design and colors of your site to match your brand.
+  <Card title="Real-time FX" icon="chart-line">
+    Quote transparent exchange rates and fees instantly so customers always know what they pay.
   </Card>
-    <Card
-    title="Set up navigation"
-    icon="map"
-    href="/essentials/navigation"
-  >
-    Organize your docs to help users find what they need and succeed with your product.
-  </Card>
-  <Card
-    title="API documentation"
-    icon="terminal"
-    href="/api-reference/introduction"
-  >
-    Auto-generate API documentation from OpenAPI specifications.
+  <Card title="Enterprise security" icon="shield-check">
+    Protect every transaction with tenancy-aware wallets, multi-step approval flows, and audit-ready logs.
   </Card>
 </Columns>
 
-## Create beautiful pages
-
-Everything you need to create world-class documentation.
+## What you can build
 
 <Columns cols={2}>
-  <Card
-    title="Write with MDX"
-    icon="pen-fancy"
-    href="/essentials/markdown"
-  >
-    Use MDX to style your docs pages.
+  <Card title="Customer payouts" icon="bank">
+    Initiate one-off or recurring payouts to marketplace sellers, suppliers, or gig workers.
   </Card>
-  <Card
-    title="Code samples"
-    icon="code"
-    href="/essentials/code"
-  >
-    Add sample code to demonstrate how to use your product.
+  <Card title="Treasury automation" icon="arrows-rotate">
+    Automate FX conversions and move balances between Yala wallets and external bank accounts.
   </Card>
-  <Card
-    title="Images"
-    icon="image"
-    href="/essentials/images"
-  >
-    Display images and other media.
+  <Card title="Multi-currency wallets" icon="wallet">
+    Hold balances in USD, NGN, EUR, GBP, CNY (RMB), INR, and more—funded inside the Yala app with no virtual account setup.
   </Card>
-  <Card
-    title="Reusable snippets"
-    icon="recycle"
-    href="/essentials/reusable-snippets"
-  >
-    Write once and reuse across your docs.
+  <Card title="Embedded finance" icon="bolt">
+    Launch branded cross-border remittance flows directly inside your product.
+  </Card>
+  <Card title="Compliance-friendly flows" icon="shield-halved">
+    Collect supporting documents, enforce approval steps, and monitor risk levels in real time.
   </Card>
 </Columns>
 
-## Need inspiration?
+## Get started quickly
 
-<Card
-  title="See complete examples"
-  icon="stars"
-  href="https://mintlify.com/customers"
->
-  Browse our showcase of exceptional documentation sites.
-</Card>
+<Steps>
+  <Step title="Request sandbox access" icon="key" href="mailto:support@useyala.com">
+    Reach out to Yala Developer Support for sandbox credentials and your dedicated API key.
+  </Step>
+  <Step title="Quote payouts" icon="calculator" href="/api-reference/endpoint/calculate-exchange-rate">
+    Use the exchange-rate calculator endpoint to determine fees, settlement timings, and FX rates.
+  </Step>
+  <Step title="Initiate transactions" icon="paper-plane" href="/api-reference/endpoint/initiate">
+    Create payouts programmatically, attach compliance metadata, and track status changes via webhooks.
+  </Step>
+</Steps>
+
+## Resources
+
+<Columns cols={2}>
+  <Card title="Authentication" icon="lock" href="/guides/authentication">
+    Learn how to sign requests with API keys and manage environments securely.
+  </Card>
+  <Card title="Error handling" icon="triangle-exclamation" href="/guides/errors">
+    Standardize how your integration responds to validation, authorization, and upstream issues.
+  </Card>
+</Columns>
+
+<Note>
+  Need help or custom payment corridors? Email our developer support team at [support@useyala.com](mailto:support@useyala.com).
+</Note>

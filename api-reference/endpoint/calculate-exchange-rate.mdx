@@ -1,0 +1,16 @@
+---
+title: "Calculate Exchange Rate"
+description: "Quote FX rates, fees, and settlement expectations for a payout."
+openapi: 'POST /payouts/calculate/exchange-rate'
+---
+
+## Usage notes
+
+- Call this endpoint before initiating a payout to show customers the exact costs.
+- The `feeBearer` determines whether the tenant or customer absorbs transaction fees.
+- Use the `includedFees` array to display rail-specific fees and settlement durations.
+
+<Tip>
+  Cache calculator responses briefly (30–60 seconds) to reduce latency while the user reviews quotes.
+</Tip>
+

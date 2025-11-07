@@ -1,0 +1,16 @@
+---
+title: "Initiate Payout"
+description: "Create a payout to send funds to a beneficiary’s bank account."
+openapi: 'POST /payouts/initiate'
+---
+
+## Usage notes
+
+- Always provide a valid `businessId` that has sufficient wallet balance in the source currency.
+- Attach `supportingDocument` links for payouts that require compliance review.
+- The response includes `PayoutData` with lifecycle fields such as `status`, `riskLevel`, and `meta.statusChange`.
+
+<Warning>
+  If the payout requires manual approval, it remains in `PENDING_APPROVAL` until an operator approves it via the Yala dashboard.
+</Warning>
+
